@@ -11,3 +11,6 @@ configuration:
   log_level:
     name: Log level
     description: debug, info, warning or error (default info)
+  dump_pages:
+    name: Dump pages to log
+    description: After the first login, write the HTML of Containers, Verrichtingen and Betalingsuitnodigingen to the log (on by default; turn off after use)

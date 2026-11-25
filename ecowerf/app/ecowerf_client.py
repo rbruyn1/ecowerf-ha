@@ -13,6 +13,12 @@ BASE_URL = "https://www.mijnecowerf.be"
 LOGIN_URL = f"{BASE_URL}/Account/Logon"
 LOGIN_PATH = "/account/logon"
 TARGET_PATH = "/aansluitpunten/containers"
+DUMP_PATHS = [
+    "/Aansluitpunten/Containers",
+    "/Aansluitpunten/Verrichtingen",
+    "/Aansluitpunten/Betalingsuitnodigingen",
+]
+DUMP_CHUNK_SIZE = 3000
 
 HEADERS = {
     "User-Agent": (
@@ -138,3 +144,52 @@ class EcowerfApi:
             form.get("method", "get").upper(),
         )
         return post_url, payload
+
+    async def async_dump_pages(self) -> None:
+        """Haal de pagina's op en zet de HTML (zonder script/style/svg) in het log."""
+        for path in DUMP_PATHS:
+            url = f"{BASE_URL}{path}"
+            _LOGGER.info("[Ecowerf] ##### DUMP START %s #####", path)
+            try:
+                async with self._session.get(
+                    url, headers=HEADERS, timeout=TIMEOUT
+                ) as resp:
+                    status = resp.status
+                    final_url = str(resp.url)
+                    html = await resp.text()
+            except (aiohttp.ClientError, TimeoutError) as err:
+                _LOGGER.error("[Ecowerf] Dump van %s mislukt: %s", path, err)
+                continue
+
+            _LOGGER.info("[Ecowerf] Dump %s: status=%s eind-url=%s", path, status, final_url)
+            soup = BeautifulSoup(html, "html.parser")
+            for tag in soup(["script", "style", "svg"]):
+                tag.decompose()
+            text = "\n".join(
+                line.strip() for line in str(soup).splitlines() if line.strip()
+            )
+            chunks = [
+                text[i : i + DUMP_CHUNK_SIZE]
+                for i in range(0, len(text), DUMP_CHUNK_SIZE)
+            ] or [""]
+            total = len(chunks)
+            for number, chunk in enumerate(chunks, start=1):
+                _LOGGER.info(
+                    "[Ecowerf] ===== HTML %s deel %s/%s BEGIN =====\n%s\n"
+                    "===== HTML %s deel %s/%s EIND =====",
+                    path, number, total, chunk, path, number, total,
+                )
+
+            links: list[str] = []
+            for anchor in soup.find_all("a", href=True):
+                entry = (
+                    f"{anchor.get_text(' ', strip=True)} -> "
+                    f"{urljoin(final_url, anchor['href'])}"
+                )
+                if entry not in links:
+                    links.append(entry)
+            _LOGGER.info(
+                "[Ecowerf] ===== LINKS %s (%s) =====\n%s",
+                path, len(links), "\n".join(links) or "geen",
+            )
+            _LOGGER.info("[Ecowerf] ##### DUMP EINDE %s #####", path)

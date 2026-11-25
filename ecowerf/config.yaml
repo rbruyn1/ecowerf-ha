@@ -1,5 +1,5 @@
 name: Ecowerf
-version: "0.1.1"
+version: "0.1.2"
 slug: ecowerf
 description: Logt in op mijnecowerf.be (ophaaldata en tarieven voor afval)
 url: https://github.com/rbruyn1/ecowerf-ha
@@ -14,8 +14,10 @@ options:
   password: ""
   update_interval_minutes: 360
   log_level: info
+  dump_pages: true
 schema:
   username: str
   password: password
   update_interval_minutes: int(15,1440)
   log_level: list(debug|info|warning|error)
+  dump_pages: bool

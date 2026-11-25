@@ -11,3 +11,6 @@ configuration:
   log_level:
     name: Logniveau
     description: debug, info, warning of error (standaard info)
+  dump_pages:
+    name: Pagina's loggen
+    description: Zet na de eerste login de HTML van Containers, Verrichtingen en Betalingsuitnodigingen in het log (standaard aan; zet uit na gebruik)

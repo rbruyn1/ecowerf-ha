@@ -17,6 +17,8 @@ async def run() -> int:
     username = os.environ.get("ECOWERF_USERNAME", "").strip()
     password = os.environ.get("ECOWERF_PASSWORD", "")
     interval = int(os.environ.get("ECOWERF_INTERVAL_MIN", "360")) * 60
+    dump_pages = os.environ.get("ECOWERF_DUMP_PAGES", "false").lower() == "true"
+    first_run = True
 
     if not username or not password:
         _LOGGER.error(
@@ -40,6 +42,11 @@ async def run() -> int:
                 return 1
             except EcowerfError as err:
                 _LOGGER.warning("Login mislukt, volgende poging over %s s: %s", interval, err)
+            else:
+                # De dump gebeurt enkel bij de eerste run na het starten van de app
+                if dump_pages and first_run:
+                    await api.async_dump_pages()
+        first_run = False
         _LOGGER.info("Volgende controle over %s minuten", interval // 60)
         await asyncio.sleep(interval)
 
