@@ -1,0 +1,22 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Ecowerf",
+        "description": "Meld je aan met je gegevens van Mijn EcoWerf.",
+        "data": {
+          "username": "Gebruikersnaam",
+          "password": "Wachtwoord"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Gebruikersnaam of wachtwoord is onjuist.",
+      "cannot_connect": "Kan het Ecowerf-portaal niet bereiken.",
+      "unknown": "Onverwachte fout. Bekijk de logs voor details."
+    },
+    "abort": {
+      "already_configured": "Dit account is al toegevoegd."
+    }
+  }
+}
