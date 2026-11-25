@@ -13,4 +13,4 @@ configuration:
     description: debug, info, warning of error (standaard info)
   dump_pages:
     name: Pagina's loggen
-    description: Zet na de eerste login de HTML van Containers, Verrichtingen en Betalingsuitnodigingen in het log (standaard aan; zet uit na gebruik)
+    description: Zet na de eerste login de verrichtingen (JSON) en de pagina's Ophaalkalender en Statistieken in het log (standaard aan; zet uit na gebruik)

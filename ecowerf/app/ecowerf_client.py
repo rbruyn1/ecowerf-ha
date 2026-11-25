@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import time
 from urllib.parse import urljoin, urlparse
 
 import aiohttp
@@ -14,10 +15,12 @@ LOGIN_URL = f"{BASE_URL}/Account/Logon"
 LOGIN_PATH = "/account/logon"
 TARGET_PATH = "/aansluitpunten/containers"
 DUMP_PATHS = [
-    "/Aansluitpunten/Containers",
-    "/Aansluitpunten/Verrichtingen",
-    "/Aansluitpunten/Betalingsuitnodigingen",
+    "/Aansluitpunten/Ophaalkalender",
+    "/Aansluitpunten/Statistieken",
 ]
+VERRICHTINGEN_PATH = "/Aansluitpunten/Verrichtingen"
+VERRICHTINGEN_AJAX_PATH = "/Aansluitpunten/ShowResultsVerrichtingen"
+SCRIPT_KEYWORDS = ("ajax", "ShowResults", "DataTable")
 DUMP_CHUNK_SIZE = 3000
 
 HEADERS = {
@@ -145,51 +148,121 @@ class EcowerfApi:
         )
         return post_url, payload
 
-    async def async_dump_pages(self) -> None:
-        """Haal de pagina's op en zet de HTML (zonder script/style/svg) in het log."""
-        for path in DUMP_PATHS:
-            url = f"{BASE_URL}{path}"
-            _LOGGER.info("[Ecowerf] ##### DUMP START %s #####", path)
-            try:
-                async with self._session.get(
-                    url, headers=HEADERS, timeout=TIMEOUT
-                ) as resp:
-                    status = resp.status
-                    final_url = str(resp.url)
-                    html = await resp.text()
-            except (aiohttp.ClientError, TimeoutError) as err:
-                _LOGGER.error("[Ecowerf] Dump van %s mislukt: %s", path, err)
-                continue
-
-            _LOGGER.info("[Ecowerf] Dump %s: status=%s eind-url=%s", path, status, final_url)
-            soup = BeautifulSoup(html, "html.parser")
-            for tag in soup(["script", "style", "svg"]):
-                tag.decompose()
-            text = "\n".join(
-                line.strip() for line in str(soup).splitlines() if line.strip()
-            )
-            chunks = [
-                text[i : i + DUMP_CHUNK_SIZE]
-                for i in range(0, len(text), DUMP_CHUNK_SIZE)
-            ] or [""]
-            total = len(chunks)
-            for number, chunk in enumerate(chunks, start=1):
-                _LOGGER.info(
-                    "[Ecowerf] ===== HTML %s deel %s/%s BEGIN =====\n%s\n"
-                    "===== HTML %s deel %s/%s EIND =====",
-                    path, number, total, chunk, path, number, total,
-                )
-
-            links: list[str] = []
-            for anchor in soup.find_all("a", href=True):
-                entry = (
-                    f"{anchor.get_text(' ', strip=True)} -> "
-                    f"{urljoin(final_url, anchor['href'])}"
-                )
-                if entry not in links:
-                    links.append(entry)
+    @staticmethod
+    def _log_chunks(label: str, text: str) -> None:
+        """Zet tekst in blokken in het log, met BEGIN/EIND-markeringen."""
+        chunks = [
+            text[i : i + DUMP_CHUNK_SIZE]
+            for i in range(0, len(text), DUMP_CHUNK_SIZE)
+        ] or [""]
+        total = len(chunks)
+        for number, chunk in enumerate(chunks, start=1):
             _LOGGER.info(
-                "[Ecowerf] ===== LINKS %s (%s) =====\n%s",
-                path, len(links), "\n".join(links) or "geen",
+                "[Ecowerf] ===== %s deel %s/%s BEGIN =====\n%s\n"
+                "===== %s deel %s/%s EIND =====",
+                label, number, total, chunk, label, number, total,
             )
+
+    async def async_dump_pages(self) -> None:
+        """Zet de verrichtingen (JSON) en enkele pagina's in het log."""
+        await self._dump_verrichtingen()
+        for path in DUMP_PATHS:
+            await self._dump_page(path)
+
+    async def _dump_verrichtingen(self) -> None:
+        """Haal de verrichtingen op via dezelfde aanroep als de website."""
+        _LOGGER.info("[Ecowerf] ##### DUMP START verrichtingen (JSON) #####")
+        params = {
+            "sEcho": "1",
+            "sSearchFilter": "[]",
+            "DisplayStart": "0",
+            "DisplayLength": "1000",
+            "SortBy": "Verrichtingsdatum",
+            "SortDirection": "desc",
+            "Verrichtingtypeid": "",
+            "_": str(int(time.time() * 1000)),
+        }
+        headers = {
+            **HEADERS,
+            "Accept": "application/json, text/javascript, */*; q=0.01",
+            "X-Requested-With": "XMLHttpRequest",
+            "Referer": f"{BASE_URL}{VERRICHTINGEN_PATH}",
+        }
+        try:
+            async with self._session.get(
+                f"{BASE_URL}{VERRICHTINGEN_AJAX_PATH}",
+                params=params,
+                headers=headers,
+                timeout=TIMEOUT,
+            ) as resp:
+                status = resp.status
+                content_type = resp.headers.get("Content-Type", "")
+                text = await resp.text()
+        except (aiohttp.ClientError, TimeoutError) as err:
+            _LOGGER.error("[Ecowerf] Dump van verrichtingen mislukt: %s", err)
+            return
+        _LOGGER.info(
+            "[Ecowerf] Verrichtingen: status=%s content-type=%s lengte=%s tekens",
+            status, content_type, len(text),
+        )
+        self._log_chunks("VERRICHTINGEN-JSON", text)
+        _LOGGER.info("[Ecowerf] ##### DUMP EINDE verrichtingen (JSON) #####")
+
+    async def _dump_page(self, path: str) -> None:
+        """Zet een pagina (zonder script/style/svg) en de relevante scripts in het log."""
+        _LOGGER.info("[Ecowerf] ##### DUMP START %s #####", path)
+        try:
+            async with self._session.get(
+                f"{BASE_URL}{path}", headers=HEADERS, timeout=TIMEOUT
+            ) as resp:
+                status = resp.status
+                final_url = str(resp.url)
+                content_type = resp.headers.get("Content-Type", "")
+                raw = await resp.read()
+        except (aiohttp.ClientError, TimeoutError) as err:
+            _LOGGER.error("[Ecowerf] Dump van %s mislukt: %s", path, err)
+            return
+
+        _LOGGER.info(
+            "[Ecowerf] Dump %s: status=%s eind-url=%s content-type=%s grootte=%s bytes",
+            path, status, final_url, content_type, len(raw),
+        )
+        if "html" not in content_type and "text" not in content_type and "json" not in content_type:
+            _LOGGER.info("[Ecowerf] Geen tekst of HTML, inhoud wordt niet gelogd")
             _LOGGER.info("[Ecowerf] ##### DUMP EINDE %s #####", path)
+            return
+
+        html = raw.decode("utf-8", errors="replace")
+        soup = BeautifulSoup(html, "html.parser")
+
+        scripts = [
+            tag.get_text()
+            for tag in soup.find_all("script")
+            if not tag.get("src")
+            and any(key in tag.get_text() for key in SCRIPT_KEYWORDS)
+        ]
+        for number, script in enumerate(scripts, start=1):
+            self._log_chunks(f"SCRIPT {path} {number}/{len(scripts)}", script)
+        if not scripts:
+            _LOGGER.info("[Ecowerf] Geen inline scripts met %s gevonden", SCRIPT_KEYWORDS)
+
+        for tag in soup(["script", "style", "svg"]):
+            tag.decompose()
+        text = "\n".join(
+            line.strip() for line in str(soup).splitlines() if line.strip()
+        )
+        self._log_chunks(f"HTML {path}", text)
+
+        links: list[str] = []
+        for anchor in soup.find_all("a", href=True):
+            entry = (
+                f"{anchor.get_text(' ', strip=True)} -> "
+                f"{urljoin(final_url, anchor['href'])}"
+            )
+            if entry not in links:
+                links.append(entry)
+        _LOGGER.info(
+            "[Ecowerf] ===== LINKS %s (%s) =====\n%s",
+            path, len(links), "\n".join(links) or "geen",
+        )
+        _LOGGER.info("[Ecowerf] ##### DUMP EINDE %s #####", path)

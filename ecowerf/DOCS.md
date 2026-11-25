@@ -14,7 +14,7 @@ Instellingen > Apps > Ecowerf > Configuratie.
 | `password` | leeg | Wachtwoord voor mijnecowerf.be (verplicht) |
 | `update_interval_minutes` | `360` | Hoe vaak de app inlogt, tussen 15 en 1440 minuten |
 | `log_level` | `info` | `debug`, `info`, `warning` of `error` |
-| `dump_pages` | `true` | Zet na de eerste login de HTML van de pagina's Containers, Verrichtingen en Betalingsuitnodigingen (en een lijst met links) in het log. Gebeurt enkel bij het starten van de app. Zet uit zodra je de gegevens hebt, want het log bevat persoonsgegevens. |
+| `dump_pages` | `true` | Zet na de eerste login de verrichtingen (JSON van `ShowResultsVerrichtingen`) en de pagina's Ophaalkalender en Statistieken (met links en relevante scripts) in het log. Gebeurt enkel bij het starten van de app. Zet uit zodra je de gegevens hebt, want het log bevat persoonsgegevens. |
 
 ## Controleren
 
