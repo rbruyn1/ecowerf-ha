@@ -1,0 +1,1 @@
+"""Ecowerf integration (placeholder)."""
