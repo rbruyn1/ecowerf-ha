@@ -14,3 +14,15 @@ configuration:
   dump_pages:
     name: Dump pages to log
     description: After the first login, write the transactions (JSON) and the Ophaalkalender and Statistieken pages to the log (on by default; turn off after use)
+  mqtt_host:
+    name: MQTT host
+    description: Leave empty when using the Mosquitto app (automatic via the Supervisor)
+  mqtt_port:
+    name: MQTT port
+    description: Broker port (default 1883, manual broker only)
+  mqtt_username:
+    name: MQTT username
+    description: Manual broker only
+  mqtt_password:
+    name: MQTT password
+    description: Manual broker only

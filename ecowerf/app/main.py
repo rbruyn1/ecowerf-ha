@@ -1,7 +1,8 @@
-"""Ecowerf-app: logt periodiek in op mijnecowerf.be (stap 1: enkel login testen)."""
+"""Ecowerf-app: haalt gegevens op van mijnecowerf.be en publiceert ze via MQTT."""
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
 import os
 import sys
@@ -9,6 +10,7 @@ import sys
 import aiohttp
 
 from ecowerf_client import EcowerfApi, EcowerfAuthError, EcowerfError
+from mqtt_publisher import MqttPublisher
 
 _LOGGER = logging.getLogger("ecowerf")
 
@@ -18,7 +20,7 @@ async def run() -> int:
     password = os.environ.get("ECOWERF_PASSWORD", "")
     interval = int(os.environ.get("ECOWERF_INTERVAL_MIN", "360")) * 60
     dump_pages = os.environ.get("ECOWERF_DUMP_PAGES", "false").lower() == "true"
-    first_run = True
+    mqtt_host = os.environ.get("MQTT_HOST", "").strip()
 
     if not username or not password:
         _LOGGER.error(
@@ -26,29 +28,53 @@ async def run() -> int:
             "tabblad Configuratie van de app en start de app opnieuw"
         )
         return 1
+    if not mqtt_host:
+        _LOGGER.error(
+            "Geen MQTT-broker gevonden: installeer en start de Mosquitto-app met de "
+            "MQTT-integratie, of vul mqtt_host in op het tabblad Configuratie"
+        )
+        return 1
 
-    while True:
-        # Telkens een nieuwe sessie, zodat er geen oude cookies blijven hangen
-        async with aiohttp.ClientSession() as session:
-            api = EcowerfApi(session, username, password)
-            try:
-                await api.async_login()
-            except EcowerfAuthError:
-                # Niet blijven proberen: voorkomt dat het account geblokkeerd raakt
-                _LOGGER.error(
-                    "Login geweigerd: controleer gebruikersnaam en wachtwoord "
-                    "in de configuratie en start de app opnieuw"
-                )
-                return 1
-            except EcowerfError as err:
-                _LOGGER.warning("Login mislukt, volgende poging over %s s: %s", interval, err)
-            else:
-                # De dump gebeurt enkel bij de eerste run na het starten van de app
-                if dump_pages and first_run:
-                    await api.async_dump_pages()
-        first_run = False
-        _LOGGER.info("Volgende controle over %s minuten", interval // 60)
-        await asyncio.sleep(interval)
+    publisher = MqttPublisher(
+        mqtt_host,
+        int(os.environ.get("MQTT_PORT", "1883") or 1883),
+        os.environ.get("MQTT_USERNAME", ""),
+        os.environ.get("MQTT_PASSWORD", ""),
+    )
+    publisher.connect()
+
+    first_run = True
+    try:
+        while True:
+            # Telkens een nieuwe sessie, zodat er geen oude cookies blijven hangen
+            async with aiohttp.ClientSession() as session:
+                api = EcowerfApi(session, username, password)
+                try:
+                    await api.async_login()
+                except EcowerfAuthError:
+                    # Niet blijven proberen: voorkomt dat het account geblokkeerd raakt
+                    _LOGGER.error(
+                        "Login geweigerd: controleer gebruikersnaam en wachtwoord "
+                        "in de configuratie en start de app opnieuw"
+                    )
+                    return 1
+                except EcowerfError as err:
+                    _LOGGER.warning("Login mislukt, volgende poging over %s min: %s", interval // 60, err)
+                else:
+                    # De dump gebeurt enkel bij de eerste run na het starten van de app
+                    if dump_pages and first_run:
+                        await api.async_dump_pages()
+                    state = await api.async_fetch_state()
+                    if state:
+                        _LOGGER.info("Waarden: %s", json.dumps(state, ensure_ascii=False))
+                        publisher.publish_state(state)
+                    else:
+                        _LOGGER.warning("Geen gegevens opgehaald, MQTT wordt niet bijgewerkt")
+            first_run = False
+            _LOGGER.info("Volgende controle over %s minuten", interval // 60)
+            await asyncio.sleep(interval)
+    finally:
+        publisher.close()
 
 
 def main() -> None:
