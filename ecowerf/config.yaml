@@ -1,0 +1,21 @@
+name: Ecowerf
+version: "0.1.0"
+slug: ecowerf
+description: Logt in op mijnecowerf.be (ophaaldata en tarieven voor afval)
+url: https://github.com/rbruyn1/ecowerf-ha
+arch:
+  - aarch64
+  - amd64
+startup: application
+boot: auto
+init: false
+options:
+  username: ""
+  password: ""
+  update_interval_minutes: 360
+  log_level: info
+schema:
+  username: str
+  password: password
+  update_interval_minutes: int(15,1440)
+  log_level: list(debug|info|warning|error)
