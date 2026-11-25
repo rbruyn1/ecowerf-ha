@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0 - 2026-11-25
+
+- Nieuw: **Kosten deze maand** per fractie (restafval, gft, papier en karton): gewicht plus aanbiedingen van de ophalingen in de huidige kalendermaand. Dezelfde berekening als de kosten dit jaar.
+- Nieuw: **Huur totaal per maand** (som van de huur van de drie fracties) en **Totaal deze maand** (ophalingen van deze maand plus de maandelijkse huur).
+- Het aantal sensoren stijgt van 27 naar 32.
+
 ## 0.2.0 - 2026-11-25
 
 - Nieuw: de app zet de gegevens van mijnecowerf.be als sensoren in Home Assistant, via MQTT-discovery (apparaat **Ecowerf**, 27 sensoren).

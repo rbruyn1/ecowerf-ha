@@ -50,6 +50,8 @@ def _build_sensors() -> list[dict[str, Any]]:
                     device_class="weight", unit="kg"),
             _sensor(f"{fractie}_jaar_kosten", f"Kosten dit jaar {label}",
                     device_class="monetary", unit="EUR"),
+            _sensor(f"{fractie}_maand_kosten", f"Kosten deze maand {label}",
+                    device_class="monetary", unit="EUR"),
             _sensor(f"{fractie}_huur", f"Huur {label}",
                     device_class="monetary", unit="EUR"),
         ]
@@ -58,6 +60,10 @@ def _build_sensors() -> list[dict[str, Any]]:
         _sensor("openstaand", "Openstaand bedrag", device_class="monetary", unit="EUR"),
         _sensor("volgende_vervaldatum", "Volgende vervaldatum",
                 device_class="date", icon="mdi:calendar-alert"),
+        _sensor("huur_totaal", "Huur totaal per maand",
+                device_class="monetary", unit="EUR"),
+        _sensor("maand_totaal", "Totaal deze maand (ophalingen en huur)",
+                device_class="monetary", unit="EUR"),
     ]
     return sensors
 

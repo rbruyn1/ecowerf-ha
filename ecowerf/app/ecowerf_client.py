@@ -453,8 +453,10 @@ def parse_verrichtingen(text: str) -> list[dict[str, object]]:
 def build_verrichtingen_state(
     rows: list[dict[str, object]], today: date
 ) -> dict[str, object]:
-    """Laatste ophaling, tarief, jaartotalen en huur per fractie."""
+    """Laatste ophaling, tarief, jaar- en maandtotalen en huur per fractie."""
     result: dict[str, object] = {}
+    huur_totaal = 0.0
+    maand_totaal = 0.0
     for fractie in FRACTIES:
         own = [r for r in rows if r["fractie"] == fractie]
         gewicht = [r for r in own if r["type"] == "Gewicht" and r["kg"] is not None]
@@ -499,12 +501,32 @@ def build_verrichtingen_state(
             2,
         )
 
+        # deze maand (zelfde berekening als dit jaar, voor de huidige kalendermaand)
+        maand_kosten = round(
+            -sum(
+                (r["bedrag"] or 0.0)
+                for r in kosten_rows
+                if r["ophaaldatum"]
+                and (r["ophaaldatum"].year, r["ophaaldatum"].month)
+                == (today.year, today.month)
+            ),
+            2,
+        )
+        result[f"{fractie}_maand_kosten"] = maand_kosten
+        maand_totaal += maand_kosten
+
         # huur: laatste huurrij
         huur = [r for r in own if r["type"] == "Huur" and r["bedrag"] is not None]
         laatste_huur = max(huur, key=lambda r: r["datum"] or date.min, default=None)
         result[f"{fractie}_huur"] = (
             round(-laatste_huur["bedrag"], 2) if laatste_huur else None
         )
+        if laatste_huur:
+            huur_totaal += -laatste_huur["bedrag"]
+
+    # alle fracties samen: ophalingen van deze maand plus de maandelijkse huur
+    result["huur_totaal"] = round(huur_totaal, 2)
+    result["maand_totaal"] = round(maand_totaal + huur_totaal, 2)
     return result
 
 

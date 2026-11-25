@@ -36,6 +36,7 @@ Per fractie (restafval, gft, papier en karton) maakt de app dezelfde sensoren aa
 | Tarief per kg | EUR/kg | Berekend: bedrag van de laatste weging gedeeld door het gewicht |
 | Gewicht dit jaar | kg | Som van de gewogen ophalingen dit kalenderjaar |
 | Kosten dit jaar | EUR | Gewicht plus aanbiedingen dit kalenderjaar |
+| Kosten deze maand | EUR | Gewicht plus aanbiedingen van de ophalingen in de huidige kalendermaand |
 | Huur | EUR | Laatste huurbedrag per maand |
 
 Daarnaast:
@@ -45,6 +46,8 @@ Daarnaast:
 | Saldo | EUR | Huidig saldo van de Verrichtingen-pagina |
 | Openstaand bedrag | EUR | Som van de betalingsuitnodigingen die nog niet betaald zijn |
 | Volgende vervaldatum | datum | Eerste vervaldatum van een onbetaalde uitnodiging |
+| Huur totaal per maand | EUR | Som van de huurbedragen van de drie fracties |
+| Totaal deze maand | EUR | Ophalingen van deze maand van alle fracties plus de maandelijkse huur |
 
 Sensoren zonder gegevens (bijvoorbeeld het laatste gewicht gft zolang er nog geen weging was) tonen "onbekend". Als de app stopt, tonen alle sensoren "niet beschikbaar".
 

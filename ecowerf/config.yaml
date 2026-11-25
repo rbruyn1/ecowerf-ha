@@ -1,5 +1,5 @@
 name: Ecowerf
-version: "0.2.0"
+version: "0.3.0"
 slug: ecowerf
 description: Zet ophaaldata, saldo en tarieven van mijnecowerf.be als sensoren in Home Assistant (via MQTT)
 url: https://github.com/rbruyn1/ecowerf-ha
