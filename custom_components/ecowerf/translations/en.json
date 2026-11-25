@@ -1,0 +1,22 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Ecowerf",
+        "description": "Sign in with your Mijn EcoWerf credentials.",
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Username or password is incorrect.",
+      "cannot_connect": "Cannot reach the Ecowerf portal.",
+      "unknown": "Unexpected error. Check the logs for details."
+    },
+    "abort": {
+      "already_configured": "This account has already been added."
+    }
+  }
+}
