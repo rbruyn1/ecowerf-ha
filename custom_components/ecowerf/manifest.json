@@ -1,0 +1,15 @@
+{
+  "domain": "ecowerf",
+  "name": "Ecowerf",
+  "codeowners": [
+    "@rbruyn1"
+  ],
+  "config_flow": true,
+  "documentation": "https://github.com/rbruyn1/ecowerf-ha",
+  "issue_tracker": "https://github.com/rbruyn1/ecowerf-ha/issues",
+  "iot_class": "cloud_polling",
+  "requirements": [
+    "beautifulsoup4"
+  ],
+  "version": "0.0.1"
+}
