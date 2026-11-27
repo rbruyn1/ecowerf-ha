@@ -2,7 +2,7 @@
 
 Haalt je gegevens op van [mijnecowerf.be](https://www.mijnecowerf.be) en zet ze als sensoren in Home Assistant: volgende ophaling per fractie, laatste ophaling met gewicht en kosten, tarief per kg, jaartotalen, huur, saldo en openstaande betalingen.
 
-Huidige versie van de app: **0.3.2**. Zie [CHANGELOG.md](ecowerf/CHANGELOG.md) voor de wijzigingen per versie.
+Huidige versie van de app: **0.3.3**. Zie [CHANGELOG.md](ecowerf/CHANGELOG.md) voor de wijzigingen per versie.
 
 ## Vereisten
 
@@ -39,7 +39,7 @@ Per fractie (restafval, gft, papier en karton): volgende ophaling, laatste ophal
 
 Algemeen: saldo, huur totaal per maand, totaal deze maand (ophalingen en huur), huur dit jaar, totaal dit jaar (ophalingen en huur), openstaand bedrag en volgende vervaldatum.
 
-Een uitgebreide uitleg per sensor staat in [ecowerf/DOCS.md](ecowerf/DOCS.md).
+27 van de 34 sensoren komen in de langetermijnstatistieken van Home Assistant, zodat de geschiedenis niet na enkele dagen verdwijnt. Een uitgebreide uitleg per sensor staat in [ecowerf/DOCS.md](ecowerf/DOCS.md).
 
 ## Privacy
 

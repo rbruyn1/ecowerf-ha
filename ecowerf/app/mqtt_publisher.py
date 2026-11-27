@@ -68,7 +68,32 @@ def _build_sensors() -> list[dict[str, Any]]:
         _sensor("jaar_totaal", "Totaal dit jaar (ophalingen en huur)",
                 device_class="monetary", unit="EUR"),
     ]
+    for sensor in sensors:
+        state_class = _state_class(sensor)
+        if state_class:
+            sensor["state_class"] = state_class
     return sensors
+
+
+def _state_class(sensor: dict[str, Any]) -> str | None:
+    """Bepaalt of en hoe HA langetermijnstatistieken van een sensor bijhoudt.
+
+    - bedragen (monetary): enkel `total` is toegestaan
+    - gewicht dit jaar: `total_increasing` (telt door en begint met het nieuwe jaar opnieuw)
+    - laatste gewicht en tarief per kg: `measurement`
+    - datums: geen statistieken mogelijk
+    """
+    key = sensor["key"]
+    device_class = sensor.get("device_class")
+    if device_class == "date":
+        return None
+    if device_class == "monetary":
+        return "total"
+    if key.endswith("_jaar_kg"):
+        return "total_increasing"
+    if key.endswith("_laatste_kg") or key.endswith("_tarief_per_kg"):
+        return "measurement"
+    return None
 
 
 SENSORS = _build_sensors()
@@ -162,6 +187,8 @@ class MqttPublisher:
                 config["unit_of_measurement"] = sensor["unit"]
             if "icon" in sensor:
                 config["icon"] = sensor["icon"]
+            if "state_class" in sensor:
+                config["state_class"] = sensor["state_class"]
             self._client.publish(
                 f"{DISCOVERY_PREFIX}/sensor/ecowerf_{key}/config",
                 json.dumps(config),

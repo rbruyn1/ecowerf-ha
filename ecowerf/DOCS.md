@@ -55,6 +55,19 @@ Bij een mislukte login of een lege reactie probeert de app het na een uur opnieu
 
 Sensoren zonder gegevens (bijvoorbeeld het laatste gewicht gft zolang er nog geen weging was) tonen "onbekend". Als de app stopt, tonen alle sensoren "niet beschikbaar".
 
+## Geschiedenis en statistieken
+
+Home Assistant bewaart de gewone geschiedenis van een sensor maar een beperkt aantal dagen (bij jou volgens de instelling `purge_keep_days` van de recorder). Daarnaast neemt Home Assistant 27 van de 34 sensoren op in de langetermijnstatistieken, die niet verdwijnen. Welke `state_class` elke sensor heeft:
+
+| Sensoren | `state_class` |
+|---|---|
+| Alle bedragen (EUR): saldo, openstaand bedrag, huur, laatste kosten, kosten dit jaar, kosten deze maand, totalen | `total` |
+| Gewicht dit jaar (kg) | `total_increasing` |
+| Laatste gewicht (kg) en tarief per kg | `measurement` |
+| Datums (volgende ophaling, laatste ophaling, volgende vervaldatum) | geen |
+
+Statistieken beginnen vanaf het moment dat de sensor deze klasse heeft en worden niet achteraf aangemaakt. Je ziet ze onder Ontwikkelaarstools > Statistieken en in een statistiekengrafiek op je dashboard.
+
 ## Controleren
 
 Start de app en open het tabblad Log. Je ziet dan `LOGIN GESLAAGD`, `Waarden: {...}` en `MQTT: ... sensoren aangemeld`. De sensoren staan daarna onder Instellingen > Apparaten en diensten > MQTT > Ecowerf.

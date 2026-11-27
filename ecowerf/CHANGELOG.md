@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.3 - 2026-11-27
+
+- Nieuw: de sensoren worden nu opgenomen in de langetermijnstatistieken van Home Assistant (`state_class`), zodat de geschiedenis niet na 14 dagen verdwijnt. Bedragen gebruiken `total`, gewicht dit jaar `total_increasing`, laatste gewicht en tarief per kg `measurement`. Datums hebben geen statistieken.
+- Statistieken beginnen vanaf het moment van deze update en worden niet achteraf aangemaakt.
+- Geen nieuwe configuratieopties.
+
 ## 0.3.2 - 2026-11-27
 
 - Nieuw: sensoren **Huur dit jaar** (som van alle huurboekingen van het lopende kalenderjaar) en **Totaal dit jaar (ophalingen en huur)** (kosten dit jaar van de drie fracties plus de huur dit jaar). Geen nieuwe configuratieopties.
