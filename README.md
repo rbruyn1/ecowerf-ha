@@ -2,7 +2,7 @@
 
 Haalt je gegevens op van [mijnecowerf.be](https://www.mijnecowerf.be) en zet ze als sensoren in Home Assistant: volgende ophaling per fractie, laatste ophaling met gewicht en kosten, tarief per kg, jaartotalen, huur, saldo en openstaande betalingen.
 
-Huidige versie van de app: **0.2.0**. Zie [CHANGELOG.md](ecowerf/CHANGELOG.md) voor de wijzigingen per versie.
+Huidige versie van de app: **0.3.1**. Zie [CHANGELOG.md](ecowerf/CHANGELOG.md) voor de wijzigingen per versie.
 
 ## Vereisten
 
@@ -25,7 +25,7 @@ Huidige versie van de app: **0.2.0**. Zie [CHANGELOG.md](ecowerf/CHANGELOG.md) v
 |---|---|---|
 | `username` | leeg | Gebruikersnaam voor mijnecowerf.be (verplicht) |
 | `password` | leeg | Wachtwoord voor mijnecowerf.be (verplicht) |
-| `update_interval_minutes` | `360` | Hoe vaak de app gegevens ophaalt, tussen 15 en 1440 minuten |
+| `update_interval_days` | `1` | Hoe vaak de app gegevens ophaalt, in dagen (1 tot 31) |
 | `log_level` | `info` | `debug`, `info`, `warning` of `error` |
 | `dump_pages` | `false` | Zet ruwe gegevens in het log, alleen nodig bij problemen (bevat persoonsgegevens) |
 | `mqtt_host` | leeg | Leeg laten bij de Mosquitto-app (automatisch via de Supervisor) |
@@ -35,9 +35,9 @@ Huidige versie van de app: **0.2.0**. Zie [CHANGELOG.md](ecowerf/CHANGELOG.md) v
 
 ## Sensoren
 
-Per fractie (restafval, gft, papier en karton): volgende ophaling, laatste ophaling, laatste gewicht, laatste kosten, tarief per kg, gewicht dit jaar, kosten dit jaar en huur.
+Per fractie (restafval, gft, papier en karton): volgende ophaling, laatste ophaling, laatste gewicht, laatste kosten, tarief per kg, gewicht dit jaar, kosten dit jaar, kosten deze maand en huur.
 
-Algemeen: saldo, openstaand bedrag en volgende vervaldatum.
+Algemeen: saldo, huur totaal per maand, totaal deze maand (ophalingen en huur), openstaand bedrag en volgende vervaldatum.
 
 Een uitgebreide uitleg per sensor staat in [ecowerf/DOCS.md](ecowerf/DOCS.md).
 

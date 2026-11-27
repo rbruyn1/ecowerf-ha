@@ -18,7 +18,9 @@ _LOGGER = logging.getLogger("ecowerf")
 async def run() -> int:
     username = os.environ.get("ECOWERF_USERNAME", "").strip()
     password = os.environ.get("ECOWERF_PASSWORD", "")
-    interval = int(os.environ.get("ECOWERF_INTERVAL_MIN", "360")) * 60
+    days = int(os.environ.get("ECOWERF_INTERVAL_DAYS", "1"))
+    interval = days * 86400
+    retry = min(interval, 3600)  # na een storing na een uur opnieuw proberen
     dump_pages = os.environ.get("ECOWERF_DUMP_PAGES", "false").lower() == "true"
     mqtt_host = os.environ.get("MQTT_HOST", "").strip()
 
@@ -46,6 +48,7 @@ async def run() -> int:
     first_run = True
     try:
         while True:
+            wait = interval
             # Telkens een nieuwe sessie, zodat er geen oude cookies blijven hangen
             async with aiohttp.ClientSession() as session:
                 api = EcowerfApi(session, username, password)
@@ -59,7 +62,8 @@ async def run() -> int:
                     )
                     return 1
                 except EcowerfError as err:
-                    _LOGGER.warning("Login mislukt, volgende poging over %s min: %s", interval // 60, err)
+                    wait = retry
+                    _LOGGER.warning("Login mislukt, volgende poging over %s min: %s", wait // 60, err)
                 else:
                     # De dump gebeurt enkel bij de eerste run na het starten van de app
                     if dump_pages and first_run:
@@ -69,10 +73,15 @@ async def run() -> int:
                         _LOGGER.info("Waarden: %s", json.dumps(state, ensure_ascii=False))
                         publisher.publish_state(state)
                     else:
-                        _LOGGER.warning("Geen gegevens opgehaald, MQTT wordt niet bijgewerkt")
+                        wait = retry
+                        _LOGGER.warning(
+                            "Geen gegevens opgehaald, MQTT wordt niet bijgewerkt, "
+                            "volgende poging over %s min", wait // 60
+                        )
             first_run = False
-            _LOGGER.info("Volgende controle over %s minuten", interval // 60)
-            await asyncio.sleep(interval)
+            if wait == interval:
+                _LOGGER.info("Volgende controle over %s dag(en)", days)
+            await asyncio.sleep(wait)
     finally:
         publisher.close()
 

@@ -5,9 +5,9 @@ configuration:
   password:
     name: Wachtwoord
     description: Je wachtwoord op mijnecowerf.be
-  update_interval_minutes:
-    name: Interval (minuten)
-    description: Hoe vaak de app inlogt en gegevens ophaalt (15 tot 1440, standaard 360)
+  update_interval_days:
+    name: Interval (dagen)
+    description: Hoe vaak de app inlogt en gegevens ophaalt (1 tot 31 dagen, standaard 1)
   log_level:
     name: Logniveau
     description: debug, info, warning of error (standaard info)

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1 - 2026-11-27
+
+- Gewijzigd: het interval wordt nu in dagen ingesteld met `update_interval_days` (standaard 1, bereik 1 tot 31). Dit vervangt `update_interval_minutes`. Controleer na de update het tabblad Configuratie, want je gebruikersnaam en wachtwoord kunnen daarbij verdwijnen.
+- Bij een mislukte login of een lege reactie probeert de app het na een uur opnieuw, in plaats van pas bij het volgende interval.
+
 ## 0.3.0 - 2026-11-25
 
 - Nieuw: **Kosten deze maand** per fractie (restafval, gft, papier en karton): gewicht plus aanbiedingen van de ophalingen in de huidige kalendermaand. Dezelfde berekening als de kosten dit jaar.

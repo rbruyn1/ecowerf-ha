@@ -5,9 +5,9 @@ configuration:
   password:
     name: Password
     description: Your password for mijnecowerf.be
-  update_interval_minutes:
-    name: Interval (minutes)
-    description: How often the app logs in and fetches data (15 to 1440, default 360)
+  update_interval_days:
+    name: Interval (days)
+    description: How often the app logs in and fetches data (1 to 31 days, default 1)
   log_level:
     name: Log level
     description: debug, info, warning or error (default info)

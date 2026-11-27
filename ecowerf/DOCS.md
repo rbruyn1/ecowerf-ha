@@ -15,7 +15,7 @@ Instellingen > Apps > Ecowerf > Configuratie.
 |---|---|---|
 | `username` | leeg | Gebruikersnaam voor mijnecowerf.be (verplicht) |
 | `password` | leeg | Wachtwoord voor mijnecowerf.be (verplicht) |
-| `update_interval_minutes` | `360` | Hoe vaak de app gegevens ophaalt, tussen 15 en 1440 minuten |
+| `update_interval_days` | `1` | Hoe vaak de app gegevens ophaalt, in dagen (1 tot 31). Ecowerf boekt een weging pas de dag na de ophaling, vaker ophalen heeft dus geen zin. |
 | `log_level` | `info` | `debug`, `info`, `warning` of `error` |
 | `dump_pages` | `false` | Zet na de eerste login ruwe gegevens (verrichtingen, Ophaalkalender, Statistieken) in het log. Alleen nodig bij problemen. Het log bevat dan persoonsgegevens. |
 | `mqtt_host` | leeg | Leeg laten als je de Mosquitto-app gebruikt: de app haalt de gegevens dan automatisch op via de Supervisor |
@@ -48,6 +48,8 @@ Daarnaast:
 | Volgende vervaldatum | datum | Eerste vervaldatum van een onbetaalde uitnodiging |
 | Huur totaal per maand | EUR | Som van de huurbedragen van de drie fracties |
 | Totaal deze maand | EUR | Ophalingen van deze maand van alle fracties plus de maandelijkse huur |
+
+Bij een mislukte login of een lege reactie probeert de app het na een uur opnieuw, in plaats van pas bij het volgende interval.
 
 Sensoren zonder gegevens (bijvoorbeeld het laatste gewicht gft zolang er nog geen weging was) tonen "onbekend". Als de app stopt, tonen alle sensoren "niet beschikbaar".
 
