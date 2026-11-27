@@ -64,6 +64,9 @@ def _build_sensors() -> list[dict[str, Any]]:
                 device_class="monetary", unit="EUR"),
         _sensor("maand_totaal", "Totaal deze maand (ophalingen en huur)",
                 device_class="monetary", unit="EUR"),
+        _sensor("huur_jaar", "Huur dit jaar", device_class="monetary", unit="EUR"),
+        _sensor("jaar_totaal", "Totaal dit jaar (ophalingen en huur)",
+                device_class="monetary", unit="EUR"),
     ]
     return sensors
 

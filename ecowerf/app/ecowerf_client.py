@@ -457,6 +457,7 @@ def build_verrichtingen_state(
     result: dict[str, object] = {}
     huur_totaal = 0.0
     maand_totaal = 0.0
+    jaar_kosten_totaal = 0.0
     for fractie in FRACTIES:
         own = [r for r in rows if r["fractie"] == fractie]
         gewicht = [r for r in own if r["type"] == "Gewicht" and r["kg"] is not None]
@@ -501,6 +502,8 @@ def build_verrichtingen_state(
             2,
         )
 
+        jaar_kosten_totaal += result[f"{fractie}_jaar_kosten"]
+
         # deze maand (zelfde berekening als dit jaar, voor de huidige kalendermaand)
         maand_kosten = round(
             -sum(
@@ -527,6 +530,21 @@ def build_verrichtingen_state(
     # alle fracties samen: ophalingen van deze maand plus de maandelijkse huur
     result["huur_totaal"] = round(huur_totaal, 2)
     result["maand_totaal"] = round(maand_totaal + huur_totaal, 2)
+
+    # dit jaar: de echt geboekte huur van het lopende kalenderjaar (alle huurrijen)
+    huur_jaar = round(
+        -sum(
+            r["bedrag"]
+            for r in rows
+            if r["type"] == "Huur"
+            and r["bedrag"] is not None
+            and r["datum"] is not None
+            and r["datum"].year == today.year
+        ),
+        2,
+    ) + 0.0
+    result["huur_jaar"] = huur_jaar
+    result["jaar_totaal"] = round(jaar_kosten_totaal + huur_jaar, 2) + 0.0
     return result
 
 

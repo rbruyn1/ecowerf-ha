@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.2 - 2026-11-27
+
+- Nieuw: sensoren **Huur dit jaar** (som van alle huurboekingen van het lopende kalenderjaar) en **Totaal dit jaar (ophalingen en huur)** (kosten dit jaar van de drie fracties plus de huur dit jaar). Geen nieuwe configuratieopties.
+- De app heeft nu 34 sensoren.
+
 ## 0.3.1 - 2026-11-27
 
 - Gewijzigd: het interval wordt nu in dagen ingesteld met `update_interval_days` (standaard 1, bereik 1 tot 31). Dit vervangt `update_interval_minutes`. Controleer na de update het tabblad Configuratie, want je gebruikersnaam en wachtwoord kunnen daarbij verdwijnen.

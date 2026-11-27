@@ -48,6 +48,8 @@ Daarnaast:
 | Volgende vervaldatum | datum | Eerste vervaldatum van een onbetaalde uitnodiging |
 | Huur totaal per maand | EUR | Som van de huurbedragen van de drie fracties |
 | Totaal deze maand | EUR | Ophalingen van deze maand van alle fracties plus de maandelijkse huur |
+| Huur dit jaar | EUR | Som van alle huurboekingen van dit kalenderjaar, alle fracties samen |
+| Totaal dit jaar | EUR | Kosten dit jaar van alle fracties (weging en aanbiedingen) plus de huur dit jaar |
 
 Bij een mislukte login of een lege reactie probeert de app het na een uur opnieuw, in plaats van pas bij het volgende interval.
 
